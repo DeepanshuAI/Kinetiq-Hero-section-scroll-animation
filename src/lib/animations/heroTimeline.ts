@@ -6,7 +6,7 @@ gsap.registerPlugin(ScrollTrigger);
 export interface HeroTimelineRefs {
   heroSection: HTMLElement | null;
   pinWrapper: HTMLElement | null;
-  core: HTMLElement | null;
+  core: HTMLElement | HTMLElement[] | null;
   coreAccent: SVGPathElement | null;
   coreAccent2: SVGPathElement | null;
   coreInnerRing: SVGCircleElement | null;
@@ -37,9 +37,9 @@ export function createHeroTimeline(refs: HeroTimelineRefs): gsap.core.Timeline |
   const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024;
 
   // Responsive motion values
-  const coreStartX = isMobile ? '-20vw' : '-30vw';
-  const coreMidX = isMobile ? '0vw' : '5vw';
-  const coreEndX = isMobile ? '15vw' : '30vw';
+  const coreStartX = isMobile ? '-20vw' : '-25vw';
+  const coreMidX = isMobile ? '0vw' : '0vw';
+  const coreEndX = isMobile ? '10vw' : '15vw';
   const coreStartRotation = -12;
   const coreMidRotation = 3;
   const coreEndRotation = 15;
@@ -89,6 +89,22 @@ export function createHeroTimeline(refs: HeroTimelineRefs): gsap.core.Timeline |
       },
       0.05
     );
+
+    // Sync the CSS mask variables with the core's transform
+    master.fromTo(
+      refs.pinWrapper,
+      {
+        '--mask-x': coreStartX,
+        '--mask-scale': 0.8,
+      },
+      {
+        '--mask-x': coreMidX,
+        '--mask-scale': 1.05,
+        duration: 0.30,
+        ease: 'power1.inOut',
+      },
+      0.05
+    );
   }
 
   // Accent arc counter-rotation for mechanical feel
@@ -132,19 +148,68 @@ export function createHeroTimeline(refs: HeroTimelineRefs): gsap.core.Timeline |
     );
   }
 
-  // ── SCENE 2: Core crosses headline (0.35 → 0.55) ──
-  // Headline becomes more visible and shifts
+  // ── SCENE 2: Headline Reveal & Core Crossing (0.15 → 0.60) ──
+  const weBuild = refs.words.filter(w => w.dataset.group === 'we-build');
+  const things = refs.words.filter(w => w.dataset.group === 'things');
+  const thatMove = refs.words.filter(w => w.dataset.group === 'that-move');
+
+  // Typography Reveal Choreography
+  if (weBuild.length > 0) {
+    master.to(weBuild, {
+      y: 0,
+      opacity: 1,
+      filter: 'blur(0px)',
+      letterSpacing: 'var(--tracking-tight)',
+      duration: 0.25,
+      ease: 'power2.out',
+    }, 0.15);
+  }
+
+  if (things.length > 0) {
+    master.to(things, {
+      y: 0,
+      opacity: 1,
+      filter: 'blur(0px)',
+      letterSpacing: 'var(--tracking-tight)',
+      duration: 0.25,
+      ease: 'power2.out',
+    }, 0.25);
+  }
+
+  if (thatMove.length > 0) {
+    master.to(thatMove, {
+      x: 0,
+      y: 0,
+      opacity: 1,
+      filter: 'blur(0px)',
+      letterSpacing: 'var(--tracking-tight)',
+      duration: 0.25,
+      ease: 'power2.out',
+    }, 0.30);
+  }
+
+  // Core reaction when passing (0.40 -> 0.55)
   if (refs.words.length > 0) {
-    master.to(
-      refs.words,
-      {
-        scale: 1.02,
-        duration: 0.20,
-        stagger: 0.02,
+    refs.words.forEach((word, i) => {
+      // Subtle reaction: tiny horizontal displacement, scale compression
+      const dir = i % 2 === 0 ? (isMobile ? -2 : -4) : (isMobile ? 2 : 4);
+      const targetScale = isMobile ? 0.99 : 0.98;
+
+      master.to(word, {
+        x: dir,
+        scale: targetScale,
+        duration: 0.15,
         ease: 'power2.out',
-      },
-      0.35
-    );
+      }, 0.40 + (i * 0.02));
+      
+      // Return to stable
+      master.to(word, {
+        x: 0,
+        scale: 1,
+        duration: 0.15,
+        ease: 'power2.out',
+      }, 0.55 + (i * 0.02));
+    });
   }
 
   // Core continues moving past center
@@ -155,6 +220,18 @@ export function createHeroTimeline(refs: HeroTimelineRefs): gsap.core.Timeline |
         x: coreEndX,
         rotation: coreEndRotation,
         scale: isMobile ? 0.7 : 0.85,
+        duration: 0.35,
+        ease: 'power1.inOut',
+      },
+      0.35
+    );
+
+    // Sync mask
+    master.to(
+      refs.pinWrapper,
+      {
+        '--mask-x': coreEndX,
+        '--mask-scale': isMobile ? 0.7 : 0.85,
         duration: 0.35,
         ease: 'power1.inOut',
       },
@@ -199,22 +276,6 @@ export function createHeroTimeline(refs: HeroTimelineRefs): gsap.core.Timeline |
       },
       0.50
     );
-  }
-
-  // Headline words slight horizontal shift
-  if (refs.words.length > 0) {
-    refs.words.forEach((word, i) => {
-      const direction = i % 2 === 0 ? -8 : 8;
-      master.to(
-        word,
-        {
-          x: direction,
-          duration: 0.15,
-          ease: 'power2.out',
-        },
-        0.55 + i * 0.015
-      );
-    });
   }
 
   // Micro copy color transition

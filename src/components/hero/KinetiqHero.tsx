@@ -25,8 +25,10 @@ const KinetiqHero: React.FC = () => {
   const pinWrapperRef = useRef<HTMLDivElement>(null);
   const brandRef = useRef<HTMLDivElement>(null);
   const headlineRef = useRef<HTMLDivElement>(null);
+  const headlineWhiteRef = useRef<HTMLDivElement>(null);
   const microRef = useRef<HTMLDivElement>(null);
   const coreWrapperRef = useRef<HTMLDivElement>(null);
+  const coreOverlayWrapperRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const scrollIndicatorRef = useRef<HTMLDivElement>(null);
   const metricRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -50,8 +52,10 @@ const KinetiqHero: React.FC = () => {
       const allElements = [
         brandRef.current,
         headlineRef.current,
+        headlineWhiteRef.current,
         microRef.current,
         coreWrapperRef.current,
+        coreOverlayWrapperRef.current,
         trackRef.current,
         scrollIndicatorRef.current,
         ...metricRefs.current,
@@ -66,16 +70,27 @@ const KinetiqHero: React.FC = () => {
       return;
     }
 
-    // Collect word elements
-    const words = headlineRef.current
-      ? Array.from(headlineRef.current.querySelectorAll('.hero-headline-word'))
+    const wordsBlack = headlineRef.current
+      ? Array.from(headlineRef.current.querySelectorAll('.hero-headline-group'))
       : [];
+    const wordsWhite = headlineWhiteRef.current
+      ? Array.from(headlineWhiteRef.current.querySelectorAll('.hero-headline-group'))
+      : [];
+    const words = [...wordsBlack, ...wordsWhite];
 
     // Collect SVG sub-elements
-    const coreEl = coreWrapperRef.current;
-    const coreAccent = coreEl?.querySelector('.core-accent-arc') as SVGPathElement | null;
-    const coreAccent2 = coreEl?.querySelector('.core-accent-arc-2') as SVGPathElement | null;
-    const coreInnerRing = coreEl?.querySelector('.core-inner-ring') as SVGCircleElement | null;
+    const coreBaseEl = coreWrapperRef.current;
+    const coreOverlayEl = coreOverlayWrapperRef.current;
+    
+    // Accents are in overlay layer
+    const coreAccent = coreOverlayEl?.querySelector('.core-accent-arc') as SVGPathElement | null;
+    const coreAccent2 = coreOverlayEl?.querySelector('.core-accent-arc-2') as SVGPathElement | null;
+    
+    // Inner ring is in base layer
+    const coreInnerRing = coreBaseEl?.querySelector('.core-inner-ring') as SVGCircleElement | null;
+
+    // Collect both core wrappers
+    const coreWrappers = [coreWrapperRef.current, coreOverlayWrapperRef.current].filter(Boolean) as HTMLElement[];
 
     // Set initial metric state
     metricRefs.current.forEach((metric) => {
@@ -91,7 +106,7 @@ const KinetiqHero: React.FC = () => {
       words: words as HTMLElement[],
       micro: microRef.current,
       scrollIndicator: scrollIndicatorRef.current,
-      core: coreWrapperRef.current,
+      core: coreWrappers,
       track: trackRef.current,
     });
 
@@ -102,7 +117,7 @@ const KinetiqHero: React.FC = () => {
       scrollTl = createHeroTimeline({
         heroSection: heroSectionRef.current,
         pinWrapper: pinWrapperRef.current,
-        core: coreWrapperRef.current,
+        core: coreWrappers,
         coreAccent,
         coreAccent2,
         coreInnerRing,
@@ -126,7 +141,7 @@ const KinetiqHero: React.FC = () => {
 
   return (
     <section ref={heroSectionRef} className="hero-section" aria-label="Hero">
-      <div ref={bgRef} className="hero-section" style={{ position: 'relative' }}>
+      <div ref={bgRef} className="hero-bg-layer">
         <div ref={pinWrapperRef} className="hero-content">
           {/* Brand */}
           <HeroBrand ref={brandRef} />
@@ -141,77 +156,59 @@ const KinetiqHero: React.FC = () => {
           {/* Horizontal track line */}
           <div ref={trackRef} className="hero-track" />
 
-          {/* Kinetic Core */}
+          {/* Kinetic Core Base */}
           <div
             ref={coreWrapperRef}
-            style={{
-              position: 'absolute',
-              width: 'clamp(220px, 30vw, 420px)',
-              height: 'clamp(220px, 30vw, 420px)',
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
-              zIndex: 10,
-            }}
+            className="kinetic-core-container"
+            style={{ zIndex: 10 }}
           >
-            <KineticCore />
+            <KineticCore layer="base" />
           </div>
 
-          {/* Headline */}
-          <HeroHeadline ref={headlineRef} />
+          {/* Headline (Dual layered for intersection effect) */}
+          <div className="hero-headline-wrapper">
+            <HeroHeadline ref={headlineRef} className="headline-black" />
+            <HeroHeadline ref={headlineWhiteRef} className="headline-white" aria-hidden="true" />
+          </div>
+
+          {/* Kinetic Core Overlay */}
+          <div
+            ref={coreOverlayWrapperRef}
+            className="kinetic-core-container"
+            style={{ zIndex: 25, pointerEvents: 'none' }}
+          >
+            <KineticCore layer="overlay" />
+          </div>
 
           {/* Micro copy */}
           <div
             ref={microRef}
-            className="hero-micro"
-            style={{
-              position: 'absolute',
-              bottom: 'clamp(4rem, 8vh, 6rem)',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              textAlign: 'center',
-              whiteSpace: 'nowrap',
-            }}
+            className="hero-micro-container"
           >
             Creative technology / Interaction / Digital experiences
           </div>
 
-          {/* Metric Cards — positioned around the core */}
-          {METRICS.map((metric, i) => {
-            // Position metrics in quadrants around center
-            const positions = [
-              // Top-left
-              {
-                top: 'clamp(15%, 20%, 25%)',
-                left: 'clamp(4%, 8%, 12%)',
-              },
-              // Top-right
-              {
-                top: 'clamp(15%, 20%, 25%)',
-                right: 'clamp(4%, 8%, 12%)',
-              },
-              // Bottom-left
-              {
-                bottom: 'clamp(18%, 22%, 28%)',
-                left: 'clamp(4%, 8%, 12%)',
-              },
-              // Bottom-right
-              {
-                bottom: 'clamp(18%, 22%, 28%)',
-                right: 'clamp(4%, 8%, 12%)',
-              },
-            ];
-
-            return (
-              <MetricCard
-                key={metric.index}
-                ref={setMetricRef(i)}
-                data={metric}
-                className={`metric-pos-${i}`}
-                isDark={false}
-              />
-            );
-          })}
+          {/* Metric Cards */}
+          <MetricCard
+            ref={setMetricRef(0)}
+            data={METRICS[0]}
+            className="metric-pos-0"
+          />
+          <MetricCard
+            ref={setMetricRef(1)}
+            data={METRICS[1]}
+            className="metric-pos-1"
+          />
+          <MetricCard
+            ref={setMetricRef(2)}
+            data={METRICS[2]}
+            className="metric-pos-2"
+          />
+          <MetricCard
+            ref={setMetricRef(3)}
+            data={METRICS[3]}
+            className="metric-pos-3"
+          />
 
           {/* Scroll indicator */}
           <div ref={scrollIndicatorRef} className="scroll-indicator">

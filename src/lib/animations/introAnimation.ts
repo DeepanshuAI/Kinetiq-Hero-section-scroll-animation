@@ -10,7 +10,7 @@ export function createIntroAnimation(refs: {
   words: HTMLElement[];
   micro: HTMLElement | null;
   scrollIndicator: HTMLElement | null;
-  core: HTMLElement | null;
+  core: HTMLElement | HTMLElement[] | null;
   track: HTMLElement | null;
 }): gsap.core.Timeline {
   const tl = gsap.timeline({
@@ -23,9 +23,41 @@ export function createIntroAnimation(refs: {
   if (refs.brand) {
     gsap.set(refs.brand, { opacity: 0, y: 12, filter: 'blur(4px)' });
   }
+  
   if (refs.words.length > 0) {
-    gsap.set(refs.words, { opacity: 0, y: 24, filter: 'blur(6px)' });
+    // Initial states for the typographic scroll reveal
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    const weBuild = refs.words.filter(w => w.dataset.group === 'we-build');
+    const things = refs.words.filter(w => w.dataset.group === 'things');
+    const thatMove = refs.words.filter(w => w.dataset.group === 'that-move');
+
+    if (weBuild.length > 0) {
+      gsap.set(weBuild, { 
+        y: isMobile ? 30 : 60, 
+        opacity: 0.1, 
+        filter: 'blur(6px)', 
+        letterSpacing: '0.05em' 
+      });
+    }
+    if (things.length > 0) {
+      gsap.set(things, { 
+        y: isMobile ? 40 : 80, 
+        opacity: 0, 
+        filter: 'blur(4px)',
+        letterSpacing: '0.02em'
+      });
+    }
+    if (thatMove.length > 0) {
+      gsap.set(thatMove, { 
+        x: isMobile ? 15 : 40,
+        y: isMobile ? 10 : 20, 
+        opacity: 0, 
+        filter: 'blur(4px)',
+        letterSpacing: '0.02em'
+      });
+    }
   }
+
   if (refs.micro) {
     gsap.set(refs.micro, { opacity: 0, y: 10 });
   }
@@ -73,22 +105,6 @@ export function createIntroAnimation(refs: {
         ease: 'power2.out',
       },
       '-=0.3'
-    );
-  }
-
-  // Headline words stagger
-  if (refs.words.length > 0) {
-    tl.to(
-      refs.words,
-      {
-        opacity: 1,
-        y: 0,
-        filter: 'blur(0px)',
-        duration: 0.7,
-        stagger: 0.08,
-        ease: 'power3.out',
-      },
-      '-=0.5'
     );
   }
 

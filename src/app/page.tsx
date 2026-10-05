@@ -7,16 +7,10 @@ const KinetiqHero = dynamic(
   { ssr: false }
 );
 
-const SelectedWork = dynamic(
-  () => import('@/components/sections/SelectedWork'),
-  { ssr: false }
-);
-
 export default function Home() {
   return (
     <main>
       <KinetiqHero />
-      <SelectedWork />
     </main>
   );
 }
