@@ -1,0 +1,429 @@
+@import "tailwindcss";
+
+/* ─── FONTS ─── */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+/* ─── DESIGN TOKENS ─── */
+:root {
+  --color-bg: #F5F2EE;
+  --color-bg-dark: #1A1A1A;
+  --color-text: #1A1A1A;
+  --color-text-light: #F5F2EE;
+  --color-accent: #C8FF00;
+  --color-accent-dim: rgba(200, 255, 0, 0.3);
+  --color-metallic-1: #3A3A3A;
+  --color-metallic-2: #5A5A5A;
+  --color-metallic-3: #8A8A8A;
+  --color-metallic-4: #B0B0B0;
+  --color-metallic-5: #D0D0D0;
+  --color-muted: #999999;
+  --color-border: rgba(26, 26, 26, 0.1);
+  --color-border-dark: rgba(245, 242, 238, 0.12);
+  --color-card-bg: rgba(26, 26, 26, 0.03);
+  --color-card-bg-dark: rgba(245, 242, 238, 0.05);
+
+  --font-primary: 'Space Grotesk', system-ui, sans-serif;
+  --tracking-tight: -0.04em;
+  --tracking-wide: 0.15em;
+  --tracking-wider: 0.2em;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+/* ─── RESET & BASE ─── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: auto; /* Let GSAP handle smoothness */
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-primary);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: var(--color-accent);
+  color: var(--color-bg-dark);
+}
+
+/* ─── HERO SECTION ─── */
+.hero-section {
+  position: relative;
+  min-height: 100svh;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--color-bg);
+  transition: background-color 0s;
+}
+
+.hero-pin-spacer {
+  position: relative;
+}
+
+.hero-content {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100svh;
+  width: 100%;
+}
+
+/* ─── KINETIC CORE ─── */
+.kinetic-core-wrapper {
+  position: absolute;
+  will-change: transform;
+  z-index: 10;
+}
+
+.kinetic-core-svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.kinetic-core-wrapper:hover .core-inner-ring {
+  transform-origin: center;
+}
+
+/* ─── HEADLINE ─── */
+.hero-headline {
+  position: relative;
+  z-index: 5;
+  text-align: center;
+  pointer-events: none;
+}
+
+.hero-headline-word {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
+.hero-headline h1 {
+  font-family: var(--font-primary);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--tracking-tight);
+  line-height: 0.9;
+  font-size: clamp(3rem, 10vw, 10rem);
+}
+
+.hero-headline .line {
+  display: block;
+  overflow: hidden;
+}
+
+/* ─── BRAND MARK ─── */
+.hero-brand {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  z-index: 20;
+  font-family: var(--font-primary);
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+/* ─── MICRO COPY ─── */
+.hero-micro {
+  font-family: var(--font-primary);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-muted);
+}
+
+/* ─── METRIC CARDS ─── */
+.metric-card {
+  position: absolute;
+  will-change: transform, opacity;
+  z-index: 15;
+}
+
+.metric-card-inner {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  padding: 1.25rem 1.5rem;
+  background: var(--color-card-bg);
+  backdrop-filter: blur(2px);
+  min-width: 160px;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.metric-card-inner:hover {
+  border-color: var(--color-accent-dim);
+}
+
+.metric-card.dark .metric-card-inner {
+  border-color: var(--color-border-dark);
+  background: var(--color-card-bg-dark);
+}
+
+.metric-number {
+  font-family: var(--font-primary);
+  font-size: clamp(2rem, 3.5vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: var(--tracking-tight);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.metric-label {
+  font-family: var(--font-primary);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  opacity: 0.6;
+  line-height: 1.4;
+}
+
+.metric-index {
+  font-family: var(--font-primary);
+  font-size: 0.55rem;
+  font-weight: 400;
+  letter-spacing: var(--tracking-wide);
+  opacity: 0.3;
+  margin-top: 0.75rem;
+}
+
+/* ─── SELECTED WORK SECTION ─── */
+.selected-work {
+  padding: 8rem 2rem;
+  background-color: var(--color-bg-dark);
+  color: var(--color-text-light);
+  min-height: 100vh;
+}
+
+.work-card {
+  border: 1px solid var(--color-border-dark);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.4s ease, transform 0.4s ease;
+  background: rgba(245, 242, 238, 0.02);
+}
+
+.work-card:hover {
+  border-color: rgba(245, 242, 238, 0.2);
+  transform: translateY(-4px);
+}
+
+.work-card-image {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: linear-gradient(135deg, #2a2a2a 0%, #1a1a1a 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.work-card-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(200, 255, 0, 0.03) 0%,
+    transparent 60%
+  );
+}
+
+.work-card-content {
+  padding: 1.5rem;
+}
+
+.work-card-title {
+  font-family: var(--font-primary);
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.work-card-desc {
+  font-size: 0.75rem;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  opacity: 0.4;
+  font-weight: 400;
+}
+
+/* ─── SCROLL CTA ─── */
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.scroll-indicator-text {
+  font-size: 0.6rem;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  opacity: 0.4;
+}
+
+.scroll-indicator-line {
+  width: 1px;
+  height: 32px;
+  background: currentColor;
+  opacity: 0.2;
+  position: relative;
+  overflow: hidden;
+}
+
+.scroll-indicator-line::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: currentColor;
+  animation: scrollPulse 2s ease-in-out infinite;
+}
+
+@keyframes scrollPulse {
+  0% { top: -100%; opacity: 0; }
+  50% { top: 0; opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+/* ─── NAV ITEMS ─── */
+.hero-nav {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  z-index: 20;
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+}
+
+.hero-nav-link {
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  opacity: 0.5;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.3s ease;
+}
+
+.hero-nav-link:hover {
+  opacity: 1;
+}
+
+/* ─── TRACK LINE ─── */
+.hero-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.06;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1024px) {
+  .hero-brand {
+    top: 1.5rem;
+    left: 1.5rem;
+    font-size: 0.8rem;
+  }
+
+  .hero-nav {
+    top: 1.5rem;
+    right: 1.5rem;
+    gap: 1.5rem;
+  }
+
+  .metric-card-inner {
+    min-width: 140px;
+    padding: 1rem 1.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-headline h1 {
+    font-size: clamp(2.2rem, 12vw, 5rem);
+  }
+
+  .hero-nav {
+    display: none;
+  }
+
+  .hero-brand {
+    top: 1.25rem;
+    left: 1.25rem;
+    font-size: 0.75rem;
+  }
+
+  .metric-card-inner {
+    min-width: 120px;
+    padding: 0.875rem 1rem;
+  }
+
+  .metric-number {
+    font-size: clamp(1.75rem, 6vw, 2.5rem);
+  }
+
+  .metric-label {
+    font-size: 0.55rem;
+  }
+
+  .selected-work {
+    padding: 4rem 1.25rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hero-headline h1 {
+    font-size: clamp(2rem, 14vw, 3.5rem);
+    line-height: 0.95;
+  }
+
+  .metric-card-inner {
+    min-width: 100px;
+    padding: 0.75rem;
+  }
+
+  .metric-number {
+    font-size: 1.75rem;
+  }
+}
+
+/* ─── REDUCED MOTION ─── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .scroll-indicator-line::after {
+    animation: none;
+  }
+}
